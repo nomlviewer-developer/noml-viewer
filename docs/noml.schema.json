@@ -1,0 +1,676 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://noml.dev/schema/v1.0.0/noml.schema.json",
+  "title": "NOML Schema",
+  "description": "JSON Schema for NOML (NoSQL Markup Language) v1.0.0",
+  "type": "object",
+  "required": ["noml", "database", "collections"],
+  "properties": {
+    "noml": {
+      "type": "string",
+      "description": "NOML specification version",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "examples": ["1.0.0"]
+    },
+    "database": {
+      "type": "string",
+      "description": "Target database type",
+      "examples": ["firestore", "mongodb", "dynamodb"]
+    },
+    "metadata": {
+      "$ref": "#/$defs/MetadataObject"
+    },
+    "description": {
+      "type": "string",
+      "description": "Schema description"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Last update date (ISO 8601)",
+      "format": "date"
+    },
+    "enums": {
+      "type": "object",
+      "description": "Global enum definitions",
+      "additionalProperties": {
+        "$ref": "#/$defs/EnumDefinition"
+      }
+    },
+    "collections": {
+      "type": "object",
+      "description": "Collection definitions",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/CollectionDefinition"
+      }
+    },
+    "functions": {
+      "type": "object",
+      "description": "Cloud function definitions (reserved for future use)",
+      "additionalProperties": true
+    }
+  },
+  "patternProperties": {
+    "^x-": {
+      "description": "Vendor extension"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "MetadataObject": {
+      "type": "object",
+      "description": "Schema metadata",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Schema/project name",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author or team name"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EnumDefinition": {
+      "type": "object",
+      "description": "Enum definition",
+      "required": ["values"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Enum description"
+        },
+        "values": {
+          "type": "array",
+          "description": "List of allowed values",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "$ref": "#/$defs/EnumValueObject"
+              }
+            ]
+          }
+        },
+        "transitions": {
+          "type": "object",
+          "description": "State machine transitions",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "EnumValueObject": {
+      "type": "object",
+      "description": "Rich enum value with metadata",
+      "required": ["value"],
+      "properties": {
+        "value": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "number" }
+          ],
+          "description": "Enum value"
+        },
+        "label": {
+          "type": "string",
+          "description": "Display label"
+        },
+        "description": {
+          "type": "string",
+          "description": "Value description"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CollectionDefinition": {
+      "type": "object",
+      "description": "Collection definition",
+      "required": ["fields"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Collection description"
+        },
+        "path": {
+          "type": "string",
+          "description": "Custom collection path"
+        },
+        "keys": {
+          "$ref": "#/$defs/KeysDefinition"
+        },
+        "fields": {
+          "type": "object",
+          "description": "Field definitions",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/FieldDefinition"
+          }
+        },
+        "subcollections": {
+          "type": "object",
+          "description": "Nested collection definitions",
+          "additionalProperties": {
+            "$ref": "#/$defs/CollectionDefinition"
+          }
+        },
+        "indexes": {
+          "type": "array",
+          "description": "Index definitions",
+          "items": {
+            "$ref": "#/$defs/IndexDefinition"
+          }
+        },
+        "security": {
+          "$ref": "#/$defs/SecurityDefinition"
+        }
+      },
+      "patternProperties": {
+        "^x-": {
+          "description": "Vendor extension"
+        }
+      },
+      "additionalProperties": false
+    },
+    "KeysDefinition": {
+      "type": "object",
+      "description": "Key constraints",
+      "properties": {
+        "primary": {
+          "type": "string",
+          "description": "Primary key field name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Keys description"
+        },
+        "foreign": {
+          "type": "array",
+          "description": "Foreign key definitions",
+          "items": {
+            "$ref": "#/$defs/ForeignKeyDefinition"
+          }
+        },
+        "unique": {
+          "type": "array",
+          "description": "Unique key definitions",
+          "items": {
+            "$ref": "#/$defs/UniqueKeyDefinition"
+          }
+        },
+        "compositeUnique": {
+          "type": "array",
+          "description": "Composite unique key definitions",
+          "items": {
+            "$ref": "#/$defs/CompositeUniqueKeyDefinition"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "ForeignKeyDefinition": {
+      "type": "object",
+      "description": "Foreign key definition",
+      "required": ["field", "references"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Local field name"
+        },
+        "references": {
+          "type": "string",
+          "description": "Target in 'collection.field' format",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*\\.[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        "onDelete": {
+          "type": "string",
+          "description": "Delete behavior",
+          "enum": ["cascade", "restrict", "setNull"]
+        },
+        "nullable": {
+          "type": "boolean",
+          "description": "Whether the reference can be null"
+        },
+        "isArray": {
+          "type": "boolean",
+          "description": "Whether the field is an array of references"
+        },
+        "description": {
+          "type": "string",
+          "description": "Constraint description"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UniqueKeyDefinition": {
+      "type": "object",
+      "description": "Unique key definition",
+      "required": ["field"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Field name"
+        },
+        "enforceBy": {
+          "type": "string",
+          "description": "Enforcement mechanism"
+        },
+        "description": {
+          "type": "string",
+          "description": "Constraint description"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CompositeUniqueKeyDefinition": {
+      "type": "object",
+      "description": "Composite unique key definition",
+      "required": ["fields"],
+      "properties": {
+        "fields": {
+          "type": "array",
+          "description": "Field names",
+          "minItems": 2,
+          "items": {
+            "type": "string"
+          }
+        },
+        "enforceBy": {
+          "type": "string",
+          "description": "Enforcement mechanism"
+        },
+        "functionName": {
+          "type": "string",
+          "description": "Cloud function name for enforcement"
+        },
+        "description": {
+          "type": "string",
+          "description": "Constraint description"
+        }
+      },
+      "additionalProperties": false
+    },
+    "FieldDefinition": {
+      "type": "object",
+      "description": "Field definition",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Field data type"
+        },
+        "description": {
+          "type": "string",
+          "description": "Field description"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether field is required",
+          "default": false
+        },
+        "nullable": {
+          "type": "boolean",
+          "description": "Whether null is allowed",
+          "default": true
+        },
+        "default": {
+          "description": "Default value"
+        },
+        "example": {
+          "description": "Example value for documentation"
+        },
+        "source": {
+          "type": "string",
+          "description": "Data source (e.g., 'documentId')"
+        },
+        "immutable": {
+          "type": "boolean",
+          "description": "If true, field cannot be updated after creation"
+        },
+        "autoUpdate": {
+          "type": "boolean",
+          "description": "If true, field updates automatically on document write"
+        },
+        "target": {
+          "type": "string",
+          "description": "Target collection for reference type"
+        },
+        "items": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" }
+              },
+              "required": ["type"]
+            }
+          ],
+          "description": "Item type for array fields"
+        },
+        "fields": {
+          "type": "object",
+          "description": "Nested field definitions for map type",
+          "additionalProperties": {
+            "$ref": "#/$defs/FieldDefinition"
+          }
+        },
+        "validation": {
+          "$ref": "#/$defs/ValidationDefinition"
+        },
+        "constraints": {
+          "$ref": "#/$defs/ValidationDefinition",
+          "description": "Legacy alias for validation",
+          "deprecated": true
+        },
+        "security": {
+          "type": "string",
+          "description": "Field-level security expression"
+        },
+        "denormalization": {
+          "$ref": "#/$defs/DenormalizationDefinition"
+        },
+        "denormalizedFrom": {
+          "oneOf": [
+            { "type": "string" },
+            { "$ref": "#/$defs/DenormalizedFromDefinition" }
+          ],
+          "description": "Source of denormalized data"
+        },
+        "computed": {
+          "$ref": "#/$defs/ComputedDefinition"
+        }
+      },
+      "patternProperties": {
+        "^x-": {
+          "description": "Vendor extension"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ValidationDefinition": {
+      "type": "object",
+      "description": "Field validation constraints",
+      "properties": {
+        "min": {
+          "type": "number",
+          "description": "Minimum value (for numbers)"
+        },
+        "max": {
+          "type": "number",
+          "description": "Maximum value (for numbers)"
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum string length"
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum string length"
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Regular expression pattern"
+        },
+        "format": {
+          "type": "string",
+          "description": "Predefined format",
+          "enum": ["email", "url", "uuid", "date", "datetime", "phone"]
+        },
+        "minItems": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Minimum array length"
+        },
+        "maxItems": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum array length"
+        },
+        "enum": {
+          "type": "array",
+          "description": "Allowed values (inline enum)",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "number" }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "IndexDefinition": {
+      "type": "object",
+      "description": "Index definition",
+      "required": ["fields"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Index name for reference"
+        },
+        "description": {
+          "type": "string",
+          "description": "Index description"
+        },
+        "fields": {
+          "type": "array",
+          "description": "Fields to index",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "$ref": "#/$defs/IndexFieldDefinition" }
+            ]
+          }
+        },
+        "order": {
+          "type": "array",
+          "description": "Legacy: field ordering",
+          "items": {
+            "type": "string",
+            "enum": ["asc", "desc"]
+          },
+          "deprecated": true
+        },
+        "queryExample": {
+          "type": "string",
+          "description": "Example query using this index"
+        }
+      },
+      "additionalProperties": false
+    },
+    "IndexFieldDefinition": {
+      "type": "object",
+      "description": "Index field specification",
+      "required": ["field"],
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Field name"
+        },
+        "order": {
+          "type": "string",
+          "description": "Sort order",
+          "enum": ["asc", "desc"],
+          "default": "asc"
+        },
+        "arrayContains": {
+          "type": "boolean",
+          "description": "Enable array-contains queries"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SecurityDefinition": {
+      "type": "object",
+      "description": "Security rules for collection",
+      "properties": {
+        "read": {
+          "type": "array",
+          "description": "Read operation rules",
+          "items": {
+            "$ref": "#/$defs/SecurityRuleDefinition"
+          }
+        },
+        "create": {
+          "type": "array",
+          "description": "Create operation rules",
+          "items": {
+            "$ref": "#/$defs/SecurityRuleDefinition"
+          }
+        },
+        "update": {
+          "type": "array",
+          "description": "Update operation rules",
+          "items": {
+            "$ref": "#/$defs/SecurityRuleDefinition"
+          }
+        },
+        "delete": {
+          "type": "array",
+          "description": "Delete operation rules",
+          "items": {
+            "$ref": "#/$defs/SecurityRuleDefinition"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "SecurityRuleDefinition": {
+      "type": "object",
+      "description": "Security rule",
+      "required": ["condition"],
+      "properties": {
+        "condition": {
+          "type": "string",
+          "description": "Security rule condition"
+        },
+        "description": {
+          "type": "string",
+          "description": "Rule description"
+        },
+        "excludeFields": {
+          "type": "array",
+          "description": "Fields excluded from this rule",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "DenormalizationDefinition": {
+      "type": "object",
+      "description": "Denormalization settings",
+      "properties": {
+        "targets": {
+          "type": "array",
+          "description": "Where this data is copied to",
+          "items": {
+            "$ref": "#/$defs/DenormalizationTargetDefinition"
+          }
+        },
+        "syncMethod": {
+          "type": "string",
+          "description": "How to sync",
+          "enum": ["cloudFunction", "clientSdk"]
+        },
+        "functionName": {
+          "type": "string",
+          "description": "Cloud function name for syncing"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DenormalizationTargetDefinition": {
+      "type": "object",
+      "description": "Denormalization target",
+      "required": ["collection", "field"],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "Target collection"
+        },
+        "field": {
+          "type": "string",
+          "description": "Target field"
+        },
+        "condition": {
+          "type": "string",
+          "description": "Condition expression"
+        },
+        "key": {
+          "type": "string",
+          "description": "Key for map-based storage"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DenormalizedFromDefinition": {
+      "type": "object",
+      "description": "Source of denormalized data",
+      "required": ["collection", "field"],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "Source collection"
+        },
+        "field": {
+          "type": "string",
+          "description": "Source field"
+        },
+        "key": {
+          "type": "string",
+          "description": "Key for map-based lookup"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ComputedDefinition": {
+      "type": "object",
+      "description": "Computed field settings",
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "Computation method",
+          "enum": ["cloudFunction", "clientSdk"]
+        },
+        "functionName": {
+          "type": "string",
+          "description": "Cloud function name"
+        },
+        "trigger": {
+          "type": "string",
+          "description": "When to compute",
+          "enum": ["onCreate", "onUpdate", "onWrite"]
+        },
+        "formula": {
+          "type": "string",
+          "description": "Computation formula (documentation)"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
