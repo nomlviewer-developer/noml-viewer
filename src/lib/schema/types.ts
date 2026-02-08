@@ -32,6 +32,7 @@ export interface EnumValueDef {
 
 // Enum definition with optional state machine transitions
 export interface EnumDef {
+  label?: string; // Logical name (論理名)
   description?: string;
   values: (string | number | EnumValueDef)[];
   transitions?: Record<string, string[]>;
@@ -132,6 +133,7 @@ export interface ComputedDef {
 // Base field definition
 export interface BaseFieldDef {
   type: FirestoreFieldType | string; // Can be enum name
+  label?: string; // Logical name (論理名)
   description?: string;
   required?: boolean;
   nullable?: boolean;
@@ -210,6 +212,7 @@ export interface SecurityDef {
 // ===========================================
 
 export interface CollectionDef {
+  label?: string; // Logical name (論理名)
   description?: string;
   path?: string;
   keys?: KeysDef;

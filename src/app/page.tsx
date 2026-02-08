@@ -16,74 +16,91 @@ metadata:
 
 enums:
   UserRole:
+    label: ユーザー権限
     description: User permission levels
     values: [user, admin, moderator]
   PostStatus:
+    label: 投稿ステータス
     description: Publication status of posts
     values: [draft, published, archived]
   Theme:
+    label: テーマ
     description: UI theme options
     values: [light, dark, system]
 
 collections:
   users:
+    label: ユーザー
     description: User accounts
     fields:
       email:
         type: string
+        label: メールアドレス
         required: true
         description: User email address
         example: "user@example.com"
       displayName:
         type: string
+        label: 表示名
         description: Display name
         example: "John Doe"
       role:
         type: UserRole
+        label: 権限
         default: user
         description: User permission level
       createdAt:
         type: timestamp
+        label: 作成日時
         default: serverTimestamp
         description: Account creation date
 
     subcollections:
       settings:
+        label: 設定
         description: User preferences
         fields:
           theme:
             type: Theme
+            label: テーマ
             default: light
             description: UI theme preference
           notifications:
             type: boolean
+            label: 通知設定
             example: true
 
   posts:
+    label: 投稿
     description: Blog posts
     fields:
       title:
         type: string
+        label: タイトル
         required: true
         description: Post title
         example: "Getting Started with Firestore"
       content:
         type: string
+        label: 本文
         required: true
         description: Post body content
         example: "This is the main content of the blog post..."
       authorRef:
         type: reference
+        label: 著者
         target: users
         description: Reference to the post author
       tags:
         type: array
+        label: タグ
         items:
           type: string
         description: Post tags for categorization
         example: ["firebase", "tutorial", "nosql"]
       status:
         type: PostStatus
+        label: ステータス
         default: draft
         description: Publication status
 `;

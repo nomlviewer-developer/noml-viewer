@@ -179,6 +179,11 @@ function EnumCard({ name, enumDef, defaultExpanded }: EnumCardProps) {
               Enum
             </span>
             <h4 className="text-md font-semibold text-zinc-800 dark:text-zinc-100">{name}</h4>
+            {enumDef.label && (
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                ({enumDef.label})
+              </span>
+            )}
           </div>
           <span className="text-xs text-zinc-500">{enumDef.values.length} values</span>
         </div>
@@ -307,6 +312,11 @@ function CollectionCard({
               Collection
             </span>
             <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{name}</h3>
+            {collection.label && (
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                ({collection.label})
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
             <span>{fieldCount} fields</span>
@@ -593,6 +603,11 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
         </div>
         <div className="flex-1 flex items-center gap-2 flex-wrap">
           <span className="font-mono text-zinc-800 dark:text-zinc-200">{name}</span>
+          {field.label && (
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">
+              ({field.label})
+            </span>
+          )}
           {/* Badges */}
           {field.immutable && (
             <span className="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded text-xs">

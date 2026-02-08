@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage, LanguageSwitcher } from '@/lib/i18n/LanguageContext';
+import { ThemeToggle } from '@/lib/theme/ThemeContext';
 
 export function Header() {
   const pathname = usePathname();
@@ -48,6 +49,7 @@ export function Header() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <LanguageSwitcher />
             <a
               href="https://github.com/nomlviewer-developer/noml-viewer"
