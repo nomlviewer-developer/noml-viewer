@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { NomlInput } from '@/components/ui/NomlInput';
 import { SchemaViewer } from '@/components/viewer/SchemaViewer';
 import { Header } from '@/components/ui/Header';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { parseAndValidateNoml } from '@/lib/parser';
 import type { NomlSchema, ValidationResult } from '@/lib/schema/types';
 
@@ -106,6 +107,7 @@ collections:
 `;
 
 export default function Home() {
+  const { t } = useLanguage();
   const [schema, setSchema] = useState<NomlSchema | null>(null);
   const [validation, setValidation] = useState<ValidationResult | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
@@ -149,10 +151,10 @@ export default function Home() {
             <div className={`${isInputOpen ? 'opacity-100' : 'opacity-0 lg:hidden'}`}>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
-                  Input NOML Schema
+                  {t('Input NOML Schema', 'NOMLスキーマ入力')}
                 </h2>
                 <button onClick={loadSample} className="text-sm text-blue-500 hover:text-blue-600">
-                  Load Sample
+                  {t('Load Sample', 'サンプルを読み込む')}
                 </button>
               </div>
               <NomlInput value={yamlText} onYamlChange={handleYamlChange} />
@@ -161,7 +163,7 @@ export default function Home() {
               {parseError && (
                 <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                   <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                    Parse Error
+                    {t('Parse Error', 'パースエラー')}
                   </h3>
                   <p className="text-sm text-red-600 dark:text-red-400 mt-1 font-mono">
                     {parseError}
@@ -173,7 +175,7 @@ export default function Home() {
               {validation && !validation.valid && (
                 <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                   <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                    Validation Errors
+                    {t('Validation Errors', 'バリデーションエラー')}
                   </h3>
                   <ul className="text-sm text-amber-600 dark:text-amber-400 mt-1 space-y-1">
                     {validation.errors.map((error, i) => (
@@ -188,63 +190,67 @@ export default function Home() {
               {/* Success */}
               {validation?.valid && (
                 <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                  <p className="text-sm text-green-600 dark:text-green-400">Schema is valid</p>
+                  <p className="text-sm text-green-600 dark:text-green-400">{t('Schema is valid', 'スキーマは有効です')}</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Viewer Panel */}
+          {/* Viewer Panel - Sticky with independent scroll */}
           <div
             className={`transition-all duration-300 ease-in-out ${
               isInputOpen ? 'lg:w-1/2' : 'lg:w-full'
             }`}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
-                Schema Visualization
-              </h2>
-              {/* Toggle Button */}
-              <button
-                onClick={() => setIsInputOpen(!isInputOpen)}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-600 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
-              >
-                {isInputOpen ? (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-                      />
-                    </svg>
-                    Hide Editor
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 5l7 7-7 7M5 5l7 7-7 7"
-                      />
-                    </svg>
-                    Show Editor
-                  </>
-                )}
-              </button>
-            </div>
-            {schema && validation?.valid ? (
-              <SchemaViewer schema={schema} />
-            ) : (
-              <div className="flex items-center justify-center h-64 bg-white dark:bg-zinc-800 rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700">
-                <p className="text-zinc-400 dark:text-zinc-500">
-                  Enter or upload a NOML schema to visualize
-                </p>
+            <div className="lg:sticky lg:top-4 lg:h-[calc(100dvh-2rem)] flex flex-col">
+              <div className="flex items-center justify-between mb-4 shrink-0">
+                <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+                  {t('Schema Visualization', 'スキーマ表示')}
+                </h2>
+                {/* Toggle Button */}
+                <button
+                  onClick={() => setIsInputOpen(!isInputOpen)}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-600 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  {isInputOpen ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+                        />
+                      </svg>
+                      {t('Hide Editor', 'エディタを隠す')}
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                        />
+                      </svg>
+                      {t('Show Editor', 'エディタを表示')}
+                    </>
+                  )}
+                </button>
               </div>
-            )}
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                {schema && validation?.valid ? (
+                  <SchemaViewer schema={schema} />
+                ) : (
+                  <div className="flex items-center justify-center h-64 bg-white dark:bg-zinc-800 rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700">
+                    <p className="text-zinc-400 dark:text-zinc-500">
+                      {t('Enter or upload a NOML schema to visualize', 'NOMLスキーマを入力またはアップロードして可視化')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -253,7 +259,7 @@ export default function Home() {
       <footer className="border-t border-zinc-200 dark:border-zinc-700 mt-12">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-            NOMLViewer - Open Source Schema Documentation Tool
+            {t('NOMLViewer - Open Source Schema Documentation Tool', 'NOMLViewer - オープンソース スキーマドキュメントツール')}
           </p>
         </div>
       </footer>

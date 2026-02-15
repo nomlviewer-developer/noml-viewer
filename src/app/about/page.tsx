@@ -980,7 +980,7 @@ collections:
       <footer className="border-t border-zinc-200 dark:border-zinc-700 mt-12">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-            NOMLViewer - Open Source Schema Documentation Tool
+            {t('NOMLViewer - Open Source Schema Documentation Tool', 'NOMLViewer - オープンソース スキーマドキュメントツール')}
           </p>
         </div>
       </footer>

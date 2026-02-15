@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 import type {
   NomlSchema,
   CollectionDef,
@@ -17,6 +18,7 @@ interface SchemaViewerProps {
 }
 
 export function SchemaViewer({ schema }: SchemaViewerProps) {
+  const { t } = useLanguage();
   const enums = schema.enums || {};
   const [expandKey, setExpandKey] = useState(0);
   const [isAllExpanded, setIsAllExpanded] = useState(true);
@@ -37,7 +39,7 @@ export function SchemaViewer({ schema }: SchemaViewerProps) {
       {(schema.metadata || schema.description) && (
         <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
           <h2 className="text-xl font-bold text-zinc-800 dark:text-zinc-100">
-            {schema.metadata?.name || 'Schema'}
+            {schema.metadata?.name || t('Schema', 'スキーマ')}
           </h2>
           {(schema.metadata?.description || schema.description) && (
             <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -45,10 +47,10 @@ export function SchemaViewer({ schema }: SchemaViewerProps) {
             </p>
           )}
           <div className="flex flex-wrap gap-4 mt-2 text-sm text-zinc-500">
-            <span>Version: {schema.version}</span>
-            <span>Database: {schema.database}</span>
-            {schema.metadata?.author && <span>Author: {schema.metadata.author}</span>}
-            {schema.updatedAt && <span>Updated: {schema.updatedAt}</span>}
+            <span>{t('Version', 'バージョン')}: {schema.version}</span>
+            <span>{t('Database', 'データベース')}: {schema.database}</span>
+            {schema.metadata?.author && <span>{t('Author', '著者')}: {schema.metadata.author}</span>}
+            {schema.updatedAt && <span>{t('Updated', '更新日')}: {schema.updatedAt}</span>}
           </div>
         </div>
       )}
@@ -67,7 +69,7 @@ export function SchemaViewer({ schema }: SchemaViewerProps) {
               d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
             />
           </svg>
-          Expand All
+          {t('Expand All', 'すべて展開')}
         </button>
         <button
           onClick={handleCollapseAll}
@@ -81,7 +83,7 @@ export function SchemaViewer({ schema }: SchemaViewerProps) {
               d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"
             />
           </svg>
-          Collapse All
+          {t('Collapse All', 'すべて折りたたむ')}
         </button>
       </div>
 
@@ -102,7 +104,7 @@ export function SchemaViewer({ schema }: SchemaViewerProps) {
       {/* Enums */}
       {Object.keys(enums).length > 0 && (
         <div className="mt-8">
-          <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">Enums</h3>
+          <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100 mb-4">{t('Enums', '列挙型')}</h3>
           <div className="space-y-4">
             {Object.entries(enums).map(([enumName, enumDef]) => (
               <EnumCard
@@ -154,6 +156,7 @@ function getEnumDescription(item: string | number | EnumValueDef): string | unde
 }
 
 function EnumCard({ name, enumDef, defaultExpanded }: EnumCardProps) {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
   const hasDetailedValues = enumDef.values.some(
     (v) => typeof v === 'object' && v !== null && ('label' in v || 'description' in v)
@@ -176,7 +179,7 @@ function EnumCard({ name, enumDef, defaultExpanded }: EnumCardProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
             <span className="px-2 py-1 text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 rounded">
-              Enum
+              {t('Enum', '列挙型')}
             </span>
             <h4 className="text-md font-semibold text-zinc-800 dark:text-zinc-100">{name}</h4>
             {enumDef.label && (
@@ -185,7 +188,7 @@ function EnumCard({ name, enumDef, defaultExpanded }: EnumCardProps) {
               </span>
             )}
           </div>
-          <span className="text-xs text-zinc-500">{enumDef.values.length} values</span>
+          <span className="text-xs text-zinc-500">{enumDef.values.length} {t('values', '件')}</span>
         </div>
         {enumDef.description && (
           <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 ml-6">
@@ -231,7 +234,7 @@ function EnumCard({ name, enumDef, defaultExpanded }: EnumCardProps) {
           {enumDef.transitions && Object.keys(enumDef.transitions).length > 0 && (
             <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-700">
               <h5 className="text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-2">
-                State Transitions
+                {t('State Transitions', '状態遷移')}
               </h5>
               <div className="space-y-1">
                 {Object.entries(enumDef.transitions).map(([from, toList]) => (
@@ -274,6 +277,7 @@ function CollectionCard({
   enums,
   defaultExpanded,
 }: CollectionCardProps) {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded ?? true);
   const borderColors = ['border-blue-500', 'border-green-500', 'border-purple-500'];
   const borderColor = borderColors[level % borderColors.length];
@@ -309,7 +313,7 @@ function CollectionCard({
               />
             </svg>
             <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded">
-              Collection
+              {t('Collection', 'コレクション')}
             </span>
             <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{name}</h3>
             {collection.label && (
@@ -319,10 +323,10 @@ function CollectionCard({
             )}
           </div>
           <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-            <span>{fieldCount} fields</span>
+            <span>{fieldCount} {t('fields', 'フィールド')}</span>
             {subcollectionCount > 0 && (
               <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400 rounded">
-                {subcollectionCount} subcollection{subcollectionCount > 1 ? 's' : ''}
+                {subcollectionCount} {t('subcollections', 'サブコレクション')}
               </span>
             )}
           </div>
@@ -346,7 +350,7 @@ function CollectionCard({
           {/* Keys Section */}
           {collection.keys && (
             <div className="p-4 border-b border-zinc-200 dark:border-zinc-600 bg-zinc-50/50 dark:bg-zinc-700/30">
-              <h4 className="text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-2">Keys</h4>
+              <h4 className="text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-2">{t('Keys', 'キー')}</h4>
               <div className="space-y-1 text-xs">
                 {collection.keys.primary && (
                   <div className="flex items-center gap-2">
@@ -403,9 +407,9 @@ function CollectionCard({
             <div className="text-sm">
               <div className="flex text-left text-zinc-500 dark:text-zinc-400 pb-2 border-b border-zinc-200 dark:border-zinc-700">
                 <div className="w-8"></div>
-                <div className="flex-1 font-medium">Field</div>
-                <div className="w-32 font-medium">Type</div>
-                <div className="w-24 font-medium">Required</div>
+                <div className="flex-1 font-medium">{t('Field', 'フィールド')}</div>
+                <div className="w-32 font-medium">{t('Type', '型')}</div>
+                <div className="w-24 font-medium">{t('Required', '必須')}</div>
               </div>
               <div>
                 {Object.entries(collection.fields).map(([fieldName, field]) => (
@@ -419,7 +423,7 @@ function CollectionCard({
           {collection.indexes && collection.indexes.length > 0 && (
             <div className="p-4 border-t border-zinc-200 dark:border-zinc-600">
               <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                Indexes
+                {t('Indexes', 'インデックス')}
               </h4>
               <div className="space-y-2">
                 {collection.indexes.map((index, i) => (
@@ -433,7 +437,7 @@ function CollectionCard({
           {collection.subcollections && Object.keys(collection.subcollections).length > 0 && (
             <div className="p-4 border-t border-zinc-200 dark:border-zinc-600">
               <h4 className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
-                Subcollections
+                {t('Subcollections', 'サブコレクション')}
               </h4>
               <div className="space-y-3">
                 {Object.entries(collection.subcollections).map(([subName, subCollection]) => (
@@ -464,6 +468,7 @@ interface IndexRowProps {
 }
 
 function IndexRow({ index }: IndexRowProps) {
+  const { t } = useLanguage();
   const getFieldDisplay = (field: string | IndexFieldDef): string => {
     if (typeof field === 'string') return field;
     let display = field.field;
@@ -484,7 +489,7 @@ function IndexRow({ index }: IndexRowProps) {
       </div>
       {index.name && (
         <div className="text-xs text-zinc-500 mt-1">
-          <span className="font-medium">Name:</span> {index.name}
+          <span className="font-medium">{t('Name', '名前')}:</span> {index.name}
         </div>
       )}
       {index.description && (
@@ -505,6 +510,7 @@ interface FieldRowProps {
 }
 
 function FieldRow({ name, field, enums }: FieldRowProps) {
+  const { t } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showEnumTooltip, setShowEnumTooltip] = useState(false);
 
@@ -611,12 +617,12 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
           {/* Badges */}
           {field.immutable && (
             <span className="px-1.5 py-0.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 rounded text-xs">
-              immutable
+              {t('immutable', '不変')}
             </span>
           )}
           {field.autoUpdate && (
             <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded text-xs">
-              autoUpdate
+              {t('autoUpdate', '自動更新')}
             </span>
           )}
           {field.source === 'documentId' && (
@@ -626,7 +632,7 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
           )}
           {field.denormalizedFrom && (
             <span className="px-1.5 py-0.5 bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-400 rounded text-xs">
-              denorm
+              {t('denorm', '非正規化')}
             </span>
           )}
           {/* Enum indicator with tooltip */}
@@ -642,7 +648,7 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
               {showEnumTooltip && (
                 <div className="absolute left-0 top-full mt-1 z-50 p-2 bg-zinc-800 dark:bg-zinc-900 text-white rounded-lg shadow-lg text-xs min-w-max max-w-xs">
                   <div className="font-medium mb-1">
-                    {enumRefName ? `${enumRefName}:` : 'Values:'}
+                    {enumRefName ? `${enumRefName}:` : t('Values:', '値:')}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {enumValues.slice(0, 10).map((v, i) => (
@@ -654,7 +660,7 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
                       </code>
                     ))}
                     {enumValues.length > 10 && (
-                      <span className="text-zinc-400">+{enumValues.length - 10} more</span>
+                      <span className="text-zinc-400">+{enumValues.length - 10} {t('more', '件')}</span>
                     )}
                   </div>
                 </div>
@@ -669,11 +675,11 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
         </div>
         <div className="w-24">
           {field.required ? (
-            <span className="text-red-500">required</span>
+            <span className="text-red-500">{t('required', '必須')}</span>
           ) : field.nullable ? (
-            <span className="text-zinc-400">nullable</span>
+            <span className="text-zinc-400">{t('nullable', 'null許容')}</span>
           ) : (
-            <span className="text-zinc-400">optional</span>
+            <span className="text-zinc-400">{t('optional', '任意')}</span>
           )}
         </div>
       </button>
@@ -684,14 +690,14 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
           {field.description && (
             <div className="flex gap-2">
               <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">
-                Description
+                {t('Description', '説明')}
               </span>
               <span className="text-sm text-zinc-600 dark:text-zinc-300">{field.description}</span>
             </div>
           )}
           {field.source && (
             <div className="flex gap-2">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">Source</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">{t('Source', 'ソース')}</span>
               <code className="px-2 py-0.5 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded text-xs">
                 {field.source}
               </code>
@@ -699,7 +705,7 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
           )}
           {field.example !== undefined && (
             <div className="flex gap-2">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">Example</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">{t('Example', '例')}</span>
               <code className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded text-xs">
                 {formatValue(field.example)}
               </code>
@@ -707,7 +713,7 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
           )}
           {field.default !== undefined && (
             <div className="flex gap-2">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">Default</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">{t('Default', 'デフォルト')}</span>
               <code className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs">
                 {formatValue(field.default)}
               </code>
@@ -716,7 +722,7 @@ function FieldRow({ name, field, enums }: FieldRowProps) {
           {field.denormalizedFrom && (
             <div className="flex gap-2">
               <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">
-                Denorm From
+                {t('Denorm From', '非正規化元')}
               </span>
               <code className="px-2 py-0.5 bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 rounded text-xs">
                 {typeof field.denormalizedFrom === 'string'
@@ -741,6 +747,7 @@ interface ValidationDisplayProps {
 }
 
 function ValidationDisplay({ validation }: ValidationDisplayProps) {
+  const { t } = useLanguage();
   const items: { label: string; value: string }[] = [];
 
   if (validation.min !== undefined) items.push({ label: 'min', value: String(validation.min) });
@@ -761,7 +768,7 @@ function ValidationDisplay({ validation }: ValidationDisplayProps) {
 
   return (
     <div className="flex gap-2">
-      <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">Validation</span>
+      <span className="text-xs text-zinc-500 dark:text-zinc-400 w-24 shrink-0">{t('Validation', 'バリデーション')}</span>
       <div className="flex flex-wrap gap-1">
         {items.map((item) => (
           <code

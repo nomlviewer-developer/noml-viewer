@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, DragEvent, ChangeEvent } from 'react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface NomlInputProps {
   onYamlChange: (yaml: string) => void;
@@ -8,6 +9,7 @@ interface NomlInputProps {
 }
 
 export function NomlInput({ onYamlChange, value = '' }: NomlInputProps) {
+  const { t } = useLanguage();
   const [yamlText, setYamlText] = useState(value);
   const [isDragging, setIsDragging] = useState(false);
   const [activeTab, setActiveTab] = useState<'paste' | 'upload'>('paste');
@@ -76,7 +78,7 @@ export function NomlInput({ onYamlChange, value = '' }: NomlInputProps) {
           }`}
           onClick={() => setActiveTab('paste')}
         >
-          Paste YAML
+          {t('Paste YAML', 'YAMLを貼り付け')}
         </button>
         <button
           className={`px-4 py-2 text-sm font-medium transition-colors ${
@@ -86,7 +88,7 @@ export function NomlInput({ onYamlChange, value = '' }: NomlInputProps) {
           }`}
           onClick={() => setActiveTab('upload')}
         >
-          Upload File
+          {t('Upload File', 'ファイルをアップロード')}
         </button>
       </div>
 
@@ -94,7 +96,7 @@ export function NomlInput({ onYamlChange, value = '' }: NomlInputProps) {
       {activeTab === 'paste' && (
         <textarea
           className="w-full h-64 p-4 font-mono text-sm bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"
-          placeholder="Paste your NOML (YAML) here..."
+          placeholder={t('Paste your NOML (YAML) here...', 'NOML（YAML）をここに貼り付け...')}
           value={yamlText}
           onChange={handleTextChange}
         />
@@ -125,10 +127,10 @@ export function NomlInput({ onYamlChange, value = '' }: NomlInputProps) {
               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
             />
           </svg>
-          <p className="text-zinc-600 dark:text-zinc-400 mb-2">Drag & drop a YAML file here</p>
-          <p className="text-zinc-400 dark:text-zinc-500 text-sm mb-4">or</p>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-2">{t('Drag & drop a YAML file here', 'YAMLファイルをここにドラッグ＆ドロップ')}</p>
+          <p className="text-zinc-400 dark:text-zinc-500 text-sm mb-4">{t('or', 'または')}</p>
           <label className="px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors">
-            Choose File
+            {t('Choose File', 'ファイルを選択')}
             <input type="file" accept=".yaml,.yml" className="hidden" onChange={handleFileInput} />
           </label>
         </div>
@@ -137,7 +139,7 @@ export function NomlInput({ onYamlChange, value = '' }: NomlInputProps) {
       {/* Show loaded content preview in upload mode */}
       {activeTab === 'upload' && yamlText && (
         <div className="mt-4">
-          <p className="text-sm text-zinc-500 mb-2">Loaded content:</p>
+          <p className="text-sm text-zinc-500 mb-2">{t('Loaded content:', '読み込んだ内容:')}</p>
           <pre className="w-full h-32 p-4 font-mono text-xs bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg overflow-auto">
             {yamlText}
           </pre>
